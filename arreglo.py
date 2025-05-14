@@ -1,30 +1,44 @@
+import json
+
+
 class Arreglo:
     def __init__(self):
         self.items = []
 
     def agregar(self, *items):
         for item in items:
-            self.items.append(item)
+            diccionario = item.__dict__.copy()
+            diccionario.pop('es_arreglo', None)
 
-    def eliminar(self, item=None, indice=None):
-        try:
-            if indice is not None:
-                del self.items[indice]
-            else:
-                self.items.remove(item)
-            return True
-        except (IndexError, ValueError):
-            return False
+            if 'maestro' in diccionario and hasattr(diccionario['maestro'], '__dict__'):
+                maestro_obj = diccionario['maestro']
+                maestro_dict = maestro_obj.__dict__.copy()
+                maestro_dict.pop('es_arreglo', None)
+                diccionario['maestro'] = maestro_dict
 
-    def actualizar(self, objeto, atributo, nuevo_valor):
+            if 'alumnos' in diccionario and hasattr(diccionario['alumnos'], 'items'):
+                diccionario['alumnos'] = diccionario['alumnos'].items
+
+            self.items.append(diccionario)
+
+    def eliminar(self, id):
+        for i, elem in enumerate(self.items):
+            if elem.get("id") == id:
+                del self.items[i]
+                return True
+        return False
+
+    def actualizar(self, id, clave, nuevo_valor):
         for elem in self.items:
-            if elem == objeto:
-                if hasattr(elem, atributo):
-                    setattr(elem, atributo, nuevo_valor)
+            if elem.get("id") == id:
+                if clave in elem:
+                    elem[clave] = nuevo_valor
                     return True
+                return False
         return False
 
     def __str__(self):
         if not self.items:
             return "No hay elementos"
-        return str(len(self.items))
+        return json.dumps(self.items, indent=4, ensure_ascii=False)
+
