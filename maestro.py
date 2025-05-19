@@ -1,3 +1,5 @@
+import json
+
 from arreglo import Arreglo
 
 
@@ -18,26 +20,36 @@ class Maestro(Arreglo):
             self.especialidad = especialidad
             self.es_arreglo = False
 
-    def __str__(self):
+    def convADiccionario(self):
         if self.es_arreglo:
-            return super().__str__()
+            return None
         diccionario = self.__dict__.copy()
         diccionario.pop('es_arreglo', None)
-        return str(diccionario)
+        return diccionario
+
+    def imprimir_diccionario(self):
+        if not self.es_arreglo:
+            print(json.dumps(self.convADiccionario(), indent=4))
 
     def cambiarEspecialidad(self, especialidad):
         self.especialidad = especialidad
 
+    def __str__(self):
+        if self.es_arreglo:
+            return Arreglo.__str__(self)
+        return (f"Maestro: {self.nombre} {self.apellido}, {self.edad} años, "
+                f"ID: {self.num_maestro}, Especialidad: {self.especialidad}")
 
 if __name__ == "__main__":
     m1 = Maestro("Ramiro", "Esquivel", 40, "1", "Android")
     m2 = Maestro("Jesus", "Burciaga", 40, "2", "iOS")
+    m3 = Maestro("Daniel", "Garcia", 19, "3", "MongoDB")
     print(m1)
+    m2.imprimir_diccionario()
 
-
-    print(m2)
     maestros = Maestro()
     maestros.agregar(m1)
     maestros.eliminar(m1.id)
     maestros.agregar(m2)
-    print(maestros)
+    maestros.agregar(m3)
+    maestros.mostrar_diccionario()

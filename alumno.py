@@ -1,3 +1,4 @@
+import json
 from arreglo import Arreglo
 
 class Alumno(Arreglo):
@@ -17,26 +18,40 @@ class Alumno(Arreglo):
     def actualizarPromedio(self, promedio):
         self.promedio = promedio
 
+    def convADiccionario(self):
+        if self.es_arreglo:
+            return None
+        diccionario = self.__dict__.copy()
+        diccionario.pop('es_arreglo', None)
+        return diccionario
+
+    def imprimir_diccionario(self):
+        if not self.es_arreglo:
+            print(json.dumps(self.convADiccionario(), indent=4))
+
     def __str__(self):
         if self.es_arreglo:
             return Arreglo.__str__(self)
-        diccionario = self.__dict__.copy()
-        diccionario.pop('es_arreglo', None)
-        return str(diccionario)
+        return (
+            f"Alumno: {self.nombre} {self.apellido}\n"
+            f"Edad: {self.edad}\n"
+            f"Matrícula: {self.matricula}\n"
+            f"Promedio: {self.promedio}"
+        )
 
 
 
 if __name__ == "__main__":
     a1 = Alumno("Alberto", "Trejo", 18, 23170093, 10)
-    print(a1)
 
     a2 = Alumno("Jesus", "De la rosa", 19, 23170119, 10)
     a2.actualizarPromedio(9.3)
-    print(a2)
+
+    a2.imprimir_diccionario()
 
     alumnos = Alumno()
     alumnos.agregar(a1)
     alumnos.agregar(a2)
     alumnos.agregar(Alumno("Saul", "Sanchez", 20, 23170000, 10))
-    alumnos.eliminar(23170093)
-    print(alumnos)
+    alumnos.eliminar(23170000)
+    alumnos.mostrar_diccionario()
