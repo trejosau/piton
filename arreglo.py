@@ -1,4 +1,6 @@
 import json
+from datetime import datetime
+
 
 class Arreglo:
     def __init__(self):
@@ -46,6 +48,8 @@ class Arreglo:
             print("No hay elementos")
         else:
             print(json.dumps(self.convADiccionarios(), indent=4, ensure_ascii=False))
+
+
 
     def __str__(self):
         if not self.items:

@@ -1,8 +1,49 @@
 import json
 
-from alumno import Alumno
+from alumno import Alumno, instanciar_alumnos
 from arreglo import Arreglo
-from maestro import Maestro
+from maestro import Maestro, instanciar_maestros
+
+
+def leerJson(archivo):
+    import json
+    with open(archivo, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+def instanciar_grupo_json(archivo):
+
+    datos = leerJson(archivo)
+
+    def crear_grupo(d):
+        maestro = None
+        if d.get("maestro"):
+            maestro = instanciar_maestros(d["maestro"])
+
+        grupo = Grupo(
+            nombre=d.get("nombre"),
+            maestro=maestro
+        )
+        alumnos_datos = d.get("alumnos", [])
+        alumnos_inst = instanciar_alumnos(alumnos_datos)
+        if alumnos_inst:
+            if getattr(alumnos_inst, "es_arreglo", False):
+                grupo.alumnos.items.extend(alumnos_inst.items)
+            else:
+                grupo.alumnos.agregar(alumnos_inst)
+        if "id" in d:
+            grupo.id = d["id"]
+        return grupo
+
+    if isinstance(datos, list):
+        arreglo_grupos = Grupo()
+        for d in datos:
+            arreglo_grupos.agregar(crear_grupo(d))
+        return arreglo_grupos
+    elif isinstance(datos, dict):
+        return crear_grupo(datos)
+    else:
+        print("Formato de JSON no reconocido")
+        return None
 
 
 class Grupo(Arreglo):
@@ -28,23 +69,27 @@ class Grupo(Arreglo):
 
     def convADiccionario(self):
         if self.es_arreglo:
-            return None
-        diccionario = self.__dict__.copy()
-        diccionario.pop('es_arreglo', None)
+            return self.convADiccionarios()
 
-        # Convertir maestro a dict si tiene el método
-        if isinstance(self.maestro, Arreglo) and not self.maestro.es_arreglo:
-            diccionario['maestro'] = self.maestro.convADiccionario()
+        return {
+            "id": self.id,
+            "nombre": self.nombre,
+            "maestro": self.maestro.convADiccionario() if self.maestro else None,
+            "alumnos": [alumno.convADiccionario() for alumno in self.alumnos.items]
+        }
 
-        # Convertir alumnos a lista de dicts
-        if isinstance(self.alumnos, Arreglo) and self.alumnos.es_arreglo:
-            diccionario['alumnos'] = [a.convADiccionario() for a in self.alumnos.items]
-
-        return diccionario
-
-    def imprimir_diccionario(self):
+    def getDict(self):
         if not self.es_arreglo:
             print(json.dumps(self.convADiccionario(), indent=4))
+
+    def guardar_como_json(self):
+        clase = self.__class__.__name__
+        nombre_archivo = f"{clase}.json"
+
+        datos = self.convADiccionario()
+
+        with open(nombre_archivo, "w", encoding="utf-8") as f:
+            json.dump(datos, f, indent=4, ensure_ascii=False)
 
     def __str__(self):
         if self.es_arreglo:
@@ -70,10 +115,17 @@ if __name__ == "__main__":
     grupo_mobile.asignar_maestro(m1)
 
     grupo_mobile.alumnos.actualizar(a1, 'promedio', 5)
-    grupo_mobile.imprimir_diccionario()
+
+    grupo_mobile2.alumnos.agregar(a1,a2)
+    grupo_mobile2.asignar_maestro(m1)
 
     grupos_mobile = Grupo()
     grupos_mobile.agregar(grupo_mobile, grupo_mobile2)
-    grupos_mobile.mostrar_diccionario()
+
+    grupos_mobile.guardar_como_json()
+
+    grupos_desdeJson = instanciar_grupo_json("Grupo.json")
+    grupos_desdeJson.mostrar_diccionario()
+
 
 

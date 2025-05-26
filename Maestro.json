@@ -1,0 +1,18 @@
+[
+    {
+        "id": 2,
+        "nombre": "Jesus",
+        "apellido": "Burciaga",
+        "edad": 40,
+        "num_maestro": "2",
+        "especialidad": "iOS"
+    },
+    {
+        "id": 3,
+        "nombre": "Daniel",
+        "apellido": "Garcia",
+        "edad": 19,
+        "num_maestro": "3",
+        "especialidad": "MongoDB"
+    }
+]
