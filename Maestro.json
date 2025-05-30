@@ -1,6 +1,6 @@
 [
     {
-        "id": 2,
+        "id": "2",
         "nombre": "Jesus",
         "apellido": "Burciaga",
         "edad": 40,
@@ -8,7 +8,7 @@
         "especialidad": "iOS"
     },
     {
-        "id": 3,
+        "id": "3",
         "nombre": "Daniel",
         "apellido": "Garcia",
         "edad": 19,

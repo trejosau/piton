@@ -29,18 +29,21 @@ class Arreglo:
     def convADiccionarios(self):
         arreglo_convertido = []
         for item in self.items:
+            # Si el objeto tiene el método convADiccionario, úsalo.
+            if hasattr(item, 'convADiccionario'):
+                diccionario = item.convADiccionario()
+            elif isinstance(item, dict):
+                diccionario = item
+            else:
                 diccionario = item.__dict__.copy()
                 diccionario.pop('es_arreglo', None)
-
-                if 'maestro' in diccionario and diccionario['maestro'] is not None:
-                    diccionario['maestro'] = diccionario['maestro'].convADiccionario()
-
-                if 'alumnos' in diccionario:
-                    diccionario['alumnos'] = [
-                        alumno.convADiccionario() for alumno in item.alumnos.items
-                    ]
-
-                arreglo_convertido.append(diccionario)
+            # Anida los objetos complejos (maestro, alumnos, etc.)
+            if 'maestro' in diccionario and diccionario['maestro'] is not None and hasattr(diccionario['maestro'],
+                                                                                           'convADiccionario'):
+                diccionario['maestro'] = diccionario['maestro'].convADiccionario()
+            if 'alumnos' in diccionario and hasattr(diccionario['alumnos'], 'items'):
+                diccionario['alumnos'] = [alumno.convADiccionario() for alumno in diccionario['alumnos'].items]
+            arreglo_convertido.append(diccionario)
         return arreglo_convertido
 
     def mostrar_diccionario(self):
@@ -49,7 +52,8 @@ class Arreglo:
         else:
             print(json.dumps(self.convADiccionarios(), indent=4, ensure_ascii=False))
 
-
+    def __len__(self):
+        return len(self.items)
 
     def __str__(self):
         if not self.items:

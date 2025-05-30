@@ -1,57 +1,14 @@
 import json
-
-from alumno import Alumno, instanciar_alumnos
 from arreglo import Arreglo
-from maestro import Maestro, instanciar_maestros
-
-
-def leerJson(archivo):
-    import json
-    with open(archivo, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-def instanciar_grupo_json(archivo):
-
-    datos = leerJson(archivo)
-
-    def crear_grupo(d):
-        maestro = None
-        if d.get("maestro"):
-            maestro = instanciar_maestros(d["maestro"])
-
-        grupo = Grupo(
-            nombre=d.get("nombre"),
-            maestro=maestro
-        )
-        alumnos_datos = d.get("alumnos", [])
-        alumnos_inst = instanciar_alumnos(alumnos_datos)
-        if alumnos_inst:
-            if getattr(alumnos_inst, "es_arreglo", False):
-                grupo.alumnos.items.extend(alumnos_inst.items)
-            else:
-                grupo.alumnos.agregar(alumnos_inst)
-        if "id" in d:
-            grupo.id = d["id"]
-        return grupo
-
-    if isinstance(datos, list):
-        arreglo_grupos = Grupo()
-        for d in datos:
-            arreglo_grupos.agregar(crear_grupo(d))
-        return arreglo_grupos
-    elif isinstance(datos, dict):
-        return crear_grupo(datos)
-    else:
-        print("Formato de JSON no reconocido")
-        return None
-
+from alumno import Alumno
+from maestro import Maestro
 
 class Grupo(Arreglo):
     _id_counter = 1
 
-    def __init__(self, nombre=None, maestro=None):
+    def __init__(self, nombre=None, maestro=None, **kwargs):
         if nombre is None and maestro is None:
-            Arreglo.__init__(self)
+            super().__init__()
             self.es_arreglo = True
         else:
             self.id = Grupo._id_counter
@@ -61,16 +18,49 @@ class Grupo(Arreglo):
             self.alumnos = Alumno()
             self.es_arreglo = False
 
+    def leerJson(self, archivo):
+        with open(archivo, "r", encoding="utf-8") as f:
+            return json.load(f)
+
     def asignar_maestro(self, maestro):
         self.maestro = maestro
 
-    def cambiarNombre(self, nombre):
-        self.nombre = nombre
+    def instanciar(self, entrada):
+        if isinstance(entrada, str):
+            datos = self.leerJson(entrada)
+        else:
+            datos = entrada
+
+        self.items.clear()
+        if isinstance(datos, list):
+            for d in datos:
+                grupo = Grupo()
+                grupo.instanciar(d)
+                self.agregar(grupo)
+        elif isinstance(datos, dict):
+            # Llena el objeto grupo individual
+            self.id = datos.get("id", Grupo._id_counter)
+            Grupo._id_counter = max(Grupo._id_counter, self.id + 1)
+            self.nombre = datos.get("nombre")
+
+            # Instancia el maestro desde dict, archivo o lista
+            if "maestro" in datos and datos["maestro"]:
+                self.maestro = Maestro()
+                self.maestro.instanciar(datos["maestro"])
+            else:
+                self.maestro = None
+
+            # Instancia los alumnos (puede ser lista o archivo)
+            if "alumnos" in datos:
+                self.alumnos = Alumno()
+                self.alumnos.instanciar(datos["alumnos"])
+            else:
+                self.alumnos = Alumno()
+            self.es_arreglo = False
 
     def convADiccionario(self):
         if self.es_arreglo:
             return self.convADiccionarios()
-
         return {
             "id": self.id,
             "nombre": self.nombre,
@@ -78,25 +68,17 @@ class Grupo(Arreglo):
             "alumnos": [alumno.convADiccionario() for alumno in self.alumnos.items]
         }
 
-    def getDict(self):
-        if not self.es_arreglo:
-            print(json.dumps(self.convADiccionario(), indent=4))
-
     def guardar_como_json(self):
-        clase = self.__class__.__name__
-        nombre_archivo = f"{clase}.json"
-
+        nombre_archivo = "Grupo.json"
         datos = self.convADiccionario()
-
         with open(nombre_archivo, "w", encoding="utf-8") as f:
             json.dump(datos, f, indent=4, ensure_ascii=False)
+        print(f"Archivo actualizado como {nombre_archivo}")
 
     def __str__(self):
         if self.es_arreglo:
-            return Arreglo.__str__(self)
-
+            return super().__str__()
         maestro_info = f"{self.maestro.nombre} {self.maestro.apellido}" if self.maestro else "Falta asignar"
-
         return (
             f"Grupo: {self.nombre}\n"
             f"Maestro: {maestro_info}\n"
@@ -105,6 +87,7 @@ class Grupo(Arreglo):
 
 
 if __name__ == "__main__":
+    # Crea y guarda grupos
     a1 = Alumno("Alberto", "Trejo", 18, 23170093, 10)
     a2 = Alumno("Jesus", "De la rosa", 19, 23170119, 10)
     m1 = Maestro("Ramiro", "Esquivel", 40, "1", "Android")
@@ -113,10 +96,7 @@ if __name__ == "__main__":
 
     grupo_mobile.alumnos.agregar(a1, a2)
     grupo_mobile.asignar_maestro(m1)
-
-    grupo_mobile.alumnos.actualizar(a1, 'promedio', 5)
-
-    grupo_mobile2.alumnos.agregar(a1,a2)
+    grupo_mobile2.alumnos.agregar(a1, a2)
     grupo_mobile2.asignar_maestro(m1)
 
     grupos_mobile = Grupo()
@@ -124,8 +104,7 @@ if __name__ == "__main__":
 
     grupos_mobile.guardar_como_json()
 
-    grupos_desdeJson = instanciar_grupo_json("Grupo.json")
+    # Instanciar desde archivo
+    grupos_desdeJson = Grupo()
+    grupos_desdeJson.instanciar("Grupo.json")
     grupos_desdeJson.mostrar_diccionario()
-
-
-

@@ -3,7 +3,7 @@
         "id": 1,
         "nombre": "Desarrollo Móvil",
         "maestro": {
-            "id": 1,
+            "id": "1",
             "nombre": "Ramiro",
             "apellido": "Esquivel",
             "edad": 40,
@@ -33,7 +33,7 @@
         "id": 2,
         "nombre": "Desarrollo Móvil2",
         "maestro": {
-            "id": 1,
+            "id": "1",
             "nombre": "Ramiro",
             "apellido": "Esquivel",
             "edad": 40,
