@@ -52,8 +52,6 @@ class Arreglo:
         else:
             print(json.dumps(self.convADiccionarios(), indent=4, ensure_ascii=False))
 
-    def __len__(self):
-        return len(self.items)
 
     def __str__(self):
         if not self.items:

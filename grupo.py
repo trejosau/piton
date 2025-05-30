@@ -38,19 +38,16 @@ class Grupo(Arreglo):
                 grupo.instanciar(d)
                 self.agregar(grupo)
         elif isinstance(datos, dict):
-            # Llena el objeto grupo individual
             self.id = datos.get("id", Grupo._id_counter)
             Grupo._id_counter = max(Grupo._id_counter, self.id + 1)
             self.nombre = datos.get("nombre")
 
-            # Instancia el maestro desde dict, archivo o lista
+            # Instancia el maestro correctamente como instancia individual
             if "maestro" in datos and datos["maestro"]:
-                self.maestro = Maestro()
-                self.maestro.instanciar(datos["maestro"])
+                self.maestro = Maestro(**datos["maestro"])
             else:
                 self.maestro = None
 
-            # Instancia los alumnos (puede ser lista o archivo)
             if "alumnos" in datos:
                 self.alumnos = Alumno()
                 self.alumnos.instanciar(datos["alumnos"])

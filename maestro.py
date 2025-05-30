@@ -21,29 +21,44 @@ class Maestro(Arreglo):
         with open(archivo, "r", encoding="utf-8") as f:
             return json.load(f)
 
+    def es_maestro(self, dic):
+        campos_obligatorios = {"nombre", "apellido", "edad", "num_maestro", "especialidad"}
+        return campos_obligatorios.issubset(dic.keys())
+
     def instanciar(self, entrada):
         if isinstance(entrada, str):
             datos = self.leerJson(entrada)
         else:
             datos = entrada
 
-        self.items.clear()
         if isinstance(datos, list):
             for d in datos:
-                maestro = Maestro(**d)
-                self.agregar(maestro)
+                if self.es_maestro(d):
+                    maestro = Maestro(**d)
+                    self.agregar(maestro)
+                else:
+                    print(
+                        "ERROR: El archivo contiene datos que no corresponden a maestros. Usa un JSON de maestros válido.")
+                    return False
         elif isinstance(datos, dict):
-            maestro = Maestro(**datos)
-            self.agregar(maestro)
-        else:
-            print("Formato de JSON no reconocido")
+            if self.es_maestro(datos):
+                maestro = Maestro(**datos)
+                self.agregar(maestro)
+            else:
+                print("ERROR: El archivo no corresponde a un maestro válido. Usa un JSON de maestros válido.")
+                return False
 
     def convADiccionario(self):
         if self.es_arreglo:
             return self.convADiccionarios()
-        diccionario = self.__dict__.copy()
-        diccionario.pop('es_arreglo', None)
-        return diccionario
+        return {
+            "id": self.id,
+            "nombre": self.nombre,
+            "apellido": self.apellido,
+            "edad": self.edad,
+            "num_maestro": self.num_maestro,
+            "especialidad": self.especialidad
+        }
 
     def getDict(self):
         if not self.es_arreglo:
