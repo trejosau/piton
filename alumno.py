@@ -101,5 +101,6 @@ if __name__ == "__main__":
     # Instanciar desde archivo
     alumnosDesdeJson = Alumno()
     alumnosDesdeJson.instanciar("Alumno.json")
+    alumnosDesdeJson.mostrar_diccionario()
 
 
