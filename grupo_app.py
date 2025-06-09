@@ -11,18 +11,18 @@ class AppGrupos:
         self.maestros_disponibles = maestros_disponibles or []
         self.alumnos_disponibles = alumnos_disponibles or []
         self.cargar_grupos_inicial()
-        self.cargar_datos_relacionados()  # Nueva función para cargar datos relacionados
+        self.cargar_datos_relacionados()
 
     def cargar_grupos_inicial(self):
-        if "Grupos desde archivo" not in self.colecciones:
-            grupos_desde_json = Grupo()
-            if grupos_desde_json.cargar_desde_db():
-                self.colecciones["Grupos desde archivo"] = grupos_desde_json
-                st.info("Colección 'Grupos desde archivo' cargada desde base de datos")
+        if "Grupo inicial" not in self.colecciones:
+            grupo_inicial = Grupo()
+            if grupo_inicial.cargar_desde_db():
+                self.colecciones["Grupo inicial"] = grupo_inicial
+                st.info("Colección 'Grupo inicial' cargada desde base de datos")
             elif os.path.exists("Grupo.json"):
-                grupos_desde_json.leerJson("Grupo.json")
-                self.colecciones["Grupos desde archivo"] = grupos_desde_json
-                st.info("Colección 'Grupos desde archivo' cargada desde archivo JSON")
+                grupo_inicial.leerJson("Grupo.json")
+                self.colecciones["Grupo inicial"] = grupo_inicial
+                st.info("Colección 'Grupo inicial' cargada desde archivo JSON")
 
     def cargar_datos_relacionados(self):
         if not self.maestros_disponibles and "colecciones_maestros" in st.session_state:
