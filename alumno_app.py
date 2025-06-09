@@ -9,15 +9,15 @@ class AppAlumnos:
         self.cargar_alumnos_inicial()
 
     def cargar_alumnos_inicial(self):
-        if "Alumnos desde archivo" not in self.colecciones:
-            alumnos_desde_json = Alumno()
-            if alumnos_desde_json.cargar_desde_db():
-                self.colecciones["Alumnos desde archivo"] = alumnos_desde_json
-                st.info("Colección 'Alumnos desde archivo' cargada desde base de datos")
+        if "Alumnos inicial" not in self.colecciones:
+            alumnos_inicial = Alumno()
+            if alumnos_inicial.cargar_desde_db():
+                self.colecciones["Alumnos inicial"] = alumnos_inicial
+                st.info("Colección 'Alumnos inicial' cargada desde base de datos")
             elif os.path.exists("Alumno.json"):
-                alumnos_desde_json.leerJson("Alumno.json")
-                self.colecciones["Alumnos desde archivo"] = alumnos_desde_json
-                st.info("Colección 'Alumnos desde archivo' cargada desde archivo JSON")
+                alumnos_inicial.leerJson("Alumno.json")
+                self.colecciones["Alumnos inicial"] = alumnos_inicial
+                st.info("Colección 'Alumnos inicial' cargada desde archivo JSON")
 
     def formulario_alumno(self):
         nombre = st.text_input("Nombre", key="form_nombre")

@@ -11,6 +11,7 @@ class AppGrupos:
         self.maestros_disponibles = maestros_disponibles or []
         self.alumnos_disponibles = alumnos_disponibles or []
         self.cargar_grupos_inicial()
+        self.cargar_datos_relacionados()  # Nueva función para cargar datos relacionados
 
     def cargar_grupos_inicial(self):
         if "Grupos desde archivo" not in self.colecciones:
@@ -22,6 +23,28 @@ class AppGrupos:
                 grupos_desde_json.leerJson("Grupo.json")
                 self.colecciones["Grupos desde archivo"] = grupos_desde_json
                 st.info("Colección 'Grupos desde archivo' cargada desde archivo JSON")
+
+    def cargar_datos_relacionados(self):
+        if not self.maestros_disponibles and "colecciones_maestros" in st.session_state:
+            maestros = []
+            for col in st.session_state["colecciones_maestros"].values():
+                maestros.extend(col.items)
+            self.maestros_disponibles = maestros
+
+        if "colecciones_alumnos" not in st.session_state:
+            st.session_state["colecciones_alumnos"] = {}
+
+        if "Alumnos desde archivo" not in st.session_state["colecciones_alumnos"]:
+            from alumno import Alumno
+            alumnos_desde_archivo = Alumno()
+            if alumnos_desde_archivo.cargar_desde_db():
+                st.session_state["colecciones_alumnos"]["Alumnos desde archivo"] = alumnos_desde_archivo
+            elif os.path.exists("Alumno.json"):
+                try:
+                    alumnos_desde_archivo.leerJson("Alumno.json")
+                    st.session_state["colecciones_alumnos"]["Alumnos desde archivo"] = alumnos_desde_archivo
+                except Exception as e:
+                    print(f"Error al cargar alumnos desde archivo: {e}")
 
     def crear_coleccion_y_grupo(self):
         st.subheader("Crear nueva colección y grupo")
@@ -84,6 +107,21 @@ class AppGrupos:
                 if st.button("Mostrar grupos", key=f"mostrar_grupo_{nombre}"):
                     st.session_state["coleccion_mostrando"] = nombre
 
+    def obtener_alumnos_disponibles(self, alumnos_grupo):
+        """Obtener lista de alumnos disponibles para agregar al grupo"""
+        alumnos_disponibles = []
+        matriculas_en_grupo = [al.matricula for al in alumnos_grupo]
+
+        # Buscar en todas las colecciones de alumnos
+        for coleccion_al in st.session_state.get("colecciones_alumnos", {}).values():
+            for alumno in coleccion_al.items:
+                if alumno.matricula not in matriculas_en_grupo:
+                    # Evitar duplicados por matrícula
+                    if not any(a.matricula == alumno.matricula for a in alumnos_disponibles):
+                        alumnos_disponibles.append(alumno)
+
+        return alumnos_disponibles
+
     def detalle_coleccion_actual(self):
         coleccion_actual = st.session_state.get("coleccion_mostrando")
         if coleccion_actual and coleccion_actual in self.colecciones:
@@ -100,19 +138,21 @@ class AppGrupos:
                     )
 
                     alumnos = getattr(g.alumnos, "items", [])
-                    df = pd.DataFrame([{
-                        "Nombre": a.nombre,
-                        "Apellido": a.apellido,
-                        "Edad": a.edad,
-                        "Matrícula": a.matricula,
-                        "Promedio": a.promedio
-                    } for a in alumnos])
-                    st.dataframe(df, hide_index=True)
+                    if alumnos:
+                        df = pd.DataFrame([{
+                            "Nombre": a.nombre,
+                            "Apellido": a.apellido,
+                            "Edad": a.edad,
+                            "Matrícula": a.matricula,
+                            "Promedio": a.promedio
+                        } for a in alumnos])
+                        st.dataframe(df, hide_index=True)
+                    else:
+                        st.info(f"No hay alumnos en el grupo '{g.nombre}'")
 
-                    alumnos_disponibles = []
-                    if "colecciones_alumnos" in st.session_state:
-                        for coleccion_al in st.session_state["colecciones_alumnos"].values():
-                            alumnos_disponibles.extend([a for a in coleccion_al.items if a.matricula not in [al.matricula for al in alumnos]])
+                    # Obtener alumnos disponibles para agregar
+                    alumnos_disponibles = self.obtener_alumnos_disponibles(alumnos)
+
                     if alumnos_disponibles:
                         alumno_sel = st.selectbox(
                             f"Selecciona alumno para agregar al grupo '{g.nombre}'",
@@ -122,10 +162,12 @@ class AppGrupos:
                         )
                         if st.button("Agregar alumno al grupo", key=f"agregar_{g.id}"):
                             g.alumnos.agregar(alumno_sel)
-                            st.success("Alumno agregado al grupo.")
+                            st.success(f"Alumno {alumno_sel.nombre} {alumno_sel.apellido} agregado al grupo.")
                             st.rerun()
                     else:
-                        st.info("No hay alumnos disponibles para agregar.")
+                        st.info("No hay alumnos disponibles para agregar a este grupo.")
+
+                    st.markdown("---")  # Separador entre grupos
             else:
                 st.info("No hay grupos en esta colección.")
 
@@ -143,11 +185,9 @@ class AppGrupos:
 
     def render(self):
         st.header("Colecciones de Grupos")
-        if not self.maestros_disponibles and "colecciones_maestros" in st.session_state:
-            maestros = []
-            for col in st.session_state["colecciones_maestros"].values():
-                maestros.extend(col.items)
-            self.maestros_disponibles = maestros
+
+        self.cargar_datos_relacionados()
+
         self.crear_coleccion_y_grupo()
         st.markdown("---")
         self.mostrar_tarjetas_colecciones_grupos()

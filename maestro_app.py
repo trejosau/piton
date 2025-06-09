@@ -9,15 +9,15 @@ class AppMaestros:
         self.cargar_maestros_inicial()
 
     def cargar_maestros_inicial(self):
-        if "Maestros desde archivo" not in self.colecciones:
-            maestros_desde_json = Maestro()
-            if maestros_desde_json.cargar_desde_db():
-                self.colecciones["Maestros desde archivo"] = maestros_desde_json
-                st.info("Colección 'Maestros desde archivo' cargada desde base de datos")
+        if "Maestros inicial" not in self.colecciones:
+            maestros_inicial = Maestro()
+            if maestros_inicial.cargar_desde_db():
+                self.colecciones["Maestros inicial"] = maestros_inicial
+                st.info("Colección 'Maestros inicial' cargada desde base de datos")
             elif os.path.exists("Maestro.json"):
-                maestros_desde_json.leerJson("Maestro.json")
-                self.colecciones["Maestros desde archivo"] = maestros_desde_json
-                st.info("Colección 'Maestros desde archivo' cargada desde archivo JSON")
+                maestros_inicial.leerJson("Maestro.json")
+                self.colecciones["Maestros inicial"] = maestros_inicial
+                st.info("Colección 'Maestros inicial' cargada desde archivo JSON")
 
     def formulario_maestro(self, key_prefix=""):
         nombre = st.text_input("Nombre", key=f"{key_prefix}_nombre")
