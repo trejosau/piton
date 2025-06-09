@@ -4,11 +4,9 @@ from arreglo import Arreglo
 class Maestro(Arreglo):
     def __init__(self, nombre=None, apellido=None, edad=None, num_maestro=None, especialidad=None, **kwargs):
         if nombre is None and apellido is None and edad is None and num_maestro is None and especialidad is None:
-            # Arreglo de maestros
             Arreglo.__init__(self)
             self.es_arreglo = True
         else:
-            # Instancia individual de maestro
             self.id = num_maestro
             self.nombre = nombre
             self.apellido = apellido
@@ -73,7 +71,7 @@ class Maestro(Arreglo):
         datos = self.convADiccionario()
         with open(nombre_archivo, "w", encoding="utf-8") as f:
             json.dump(datos, f, indent=4, ensure_ascii=False)
-        print(f"Archivo actualizado como {nombre_archivo}")
+        print(f"Archivo guardado como {nombre_archivo}")
 
     def __str__(self):
         if self.es_arreglo:
@@ -83,7 +81,6 @@ class Maestro(Arreglo):
 
 
 if __name__ == "__main__":
-    # Crear y guardar maestros
     m1 = Maestro("Ramiro", "Esquivel", 40, "1", "Android")
     m2 = Maestro("Jesus", "Burciaga", 40, "2", "iOS")
     m3 = Maestro("Daniel", "Garcia", 19, "3", "MongoDB")
@@ -92,17 +89,14 @@ if __name__ == "__main__":
     maestros.agregar(m1)
     maestros.agregar(m2)
     maestros.agregar(m3)
-    maestros.eliminar("1")  # Elimina por num_maestro (que ahora es el id)
+    maestros.eliminar("1")
 
     maestros.guardar_como_json()
 
-    # Instanciar desde archivo
     maestrosDesdeJson = Maestro()
     maestrosDesdeJson.instanciar("Maestro.json")
 
-    # Agregar uno nuevo
     m4 = Maestro("Nuevo", "Maestro", 30, "4", "Python")
     maestrosDesdeJson.agregar(m4)
 
-    # Mostrar en formato JSON serializable
     maestrosDesdeJson.mostrar_diccionario()

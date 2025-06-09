@@ -1,14 +1,14 @@
 [
     {
-        "id": 3,
-        "nombre": "ffffff",
+        "id": 1,
+        "nombre": "Desarrollo Móvil",
         "maestro": {
-            "id": "2",
-            "nombre": "Jesus",
-            "apellido": "Burciaga",
+            "id": "1",
+            "nombre": "Ramiro",
+            "apellido": "Esquivel",
             "edad": 40,
-            "num_maestro": "2",
-            "especialidad": "iOS"
+            "num_maestro": "1",
+            "especialidad": "Android"
         },
         "alumnos": [
             {
@@ -25,7 +25,37 @@
                 "apellido": "De la rosa",
                 "edad": 19,
                 "matricula": 23170119,
-                "promedio": 9.3
+                "promedio": 10
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "nombre": "Desarrollo Móvil2",
+        "maestro": {
+            "id": "1",
+            "nombre": "Ramiro",
+            "apellido": "Esquivel",
+            "edad": 40,
+            "num_maestro": "1",
+            "especialidad": "Android"
+        },
+        "alumnos": [
+            {
+                "id": 23170093,
+                "nombre": "Alberto",
+                "apellido": "Trejo",
+                "edad": 18,
+                "matricula": 23170093,
+                "promedio": 10
+            },
+            {
+                "id": 23170119,
+                "nombre": "Jesus",
+                "apellido": "De la rosa",
+                "edad": 19,
+                "matricula": 23170119,
+                "promedio": 10
             }
         ]
     }

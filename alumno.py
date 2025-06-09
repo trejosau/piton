@@ -4,11 +4,9 @@ from arreglo import Arreglo
 class Alumno(Arreglo):
     def __init__(self, nombre=None, apellido=None, edad=None, matricula=None, promedio=None, **kwargs):
         if nombre is None and apellido is None and edad is None and matricula is None and promedio is None:
-            # Arreglo de alumnos (como colección)
             Arreglo.__init__(self)
             self.es_arreglo = True
         else:
-            # Instancia individual de alumno
             self.id = matricula
             self.nombre = nombre
             self.apellido = apellido
@@ -55,7 +53,7 @@ class Alumno(Arreglo):
         datos = self.convADiccionario()
         with open(nombre_archivo, "w", encoding="utf-8") as f:
             json.dump(datos, f, indent=4, ensure_ascii=False)
-        print(f"Archivo actualizado como {nombre_archivo}")
+        print(f"Archivo guardado como {nombre_archivo}")
 
     def __str__(self):
         if getattr(self, 'es_arreglo', False):
@@ -83,9 +81,7 @@ class Alumno(Arreglo):
             print(json.dumps(self.convADiccionario(), indent=4))
 
 
-# Ejemplo de uso (para pruebas):
 if __name__ == "__main__":
-    # Crear y guardar alumnos
     a1 = Alumno("Alberto", "Trejo", 18, 23170093, 10)
     a2 = Alumno("Jesus", "De la rosa", 19, 23170119, 9.3)
 
@@ -98,7 +94,6 @@ if __name__ == "__main__":
     alumnos.guardar_como_json()
     alumnos.mostrar_diccionario()
 
-    # Instanciar desde archivo
     alumnosDesdeJson = Alumno()
     alumnosDesdeJson.instanciar("Alumno.json")
     alumnosDesdeJson.mostrar_diccionario()

@@ -29,7 +29,6 @@ class Arreglo:
     def convADiccionarios(self):
         arreglo_convertido = []
         for item in self.items:
-            # Si el objeto tiene el método convADiccionario, úsalo.
             if hasattr(item, 'convADiccionario'):
                 diccionario = item.convADiccionario()
             elif isinstance(item, dict):
@@ -37,7 +36,6 @@ class Arreglo:
             else:
                 diccionario = item.__dict__.copy()
                 diccionario.pop('es_arreglo', None)
-            # Anida los objetos complejos (maestro, alumnos, etc.)
             if 'maestro' in diccionario and diccionario['maestro'] is not None and hasattr(diccionario['maestro'],
                                                                                            'convADiccionario'):
                 diccionario['maestro'] = diccionario['maestro'].convADiccionario()

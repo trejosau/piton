@@ -42,7 +42,6 @@ class Grupo(Arreglo):
             Grupo._id_counter = max(Grupo._id_counter, self.id + 1)
             self.nombre = datos.get("nombre")
 
-            # Instancia el maestro correctamente como instancia individual
             if "maestro" in datos and datos["maestro"]:
                 self.maestro = Maestro(**datos["maestro"])
             else:
@@ -52,6 +51,7 @@ class Grupo(Arreglo):
                 self.alumnos = Alumno()
                 self.alumnos.instanciar(datos["alumnos"])
             else:
+                
                 self.alumnos = Alumno()
             self.es_arreglo = False
 
@@ -70,7 +70,6 @@ class Grupo(Arreglo):
         datos = self.convADiccionario()
         with open(nombre_archivo, "w", encoding="utf-8") as f:
             json.dump(datos, f, indent=4, ensure_ascii=False)
-        print(f"Archivo actualizado como {nombre_archivo}")
 
     def __str__(self):
         if self.es_arreglo:
@@ -84,7 +83,6 @@ class Grupo(Arreglo):
 
 
 if __name__ == "__main__":
-    # Crea y guarda grupos
     a1 = Alumno("Alberto", "Trejo", 18, 23170093, 10)
     a2 = Alumno("Jesus", "De la rosa", 19, 23170119, 10)
     m1 = Maestro("Ramiro", "Esquivel", 40, "1", "Android")
@@ -101,7 +99,6 @@ if __name__ == "__main__":
 
     grupos_mobile.guardar_como_json()
 
-    # Instanciar desde archivo
     grupos_desdeJson = Grupo()
     grupos_desdeJson.instanciar("Grupo.json")
-    grupos_desdeJson.mostrar_diccionario()
+    grupos_desdeJson.guardar_como_json()
