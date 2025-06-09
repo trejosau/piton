@@ -1,5 +1,7 @@
 import json
 from arreglo import Arreglo
+from db_manager import DBManager
+
 
 class Maestro(Arreglo):
     def __init__(self, nombre=None, apellido=None, edad=None, num_maestro=None, especialidad=None, **kwargs):
@@ -46,6 +48,20 @@ class Maestro(Arreglo):
                 print("ERROR: El archivo no corresponde a un maestro válido. Usa un JSON de maestros válido.")
                 return False
 
+    def cargar_desde_db(self):
+        db = DBManager()
+        if db.intentar_conexion():
+            datos = db.cargar_datos("maestros", "Maestro")
+            if datos:
+                self.instanciar(datos)
+                return True
+        try:
+            datos = self.leerJson("Maestro.json")
+            self.instanciar(datos)
+            return True
+        except:
+            return False
+
     def convADiccionario(self):
         if self.es_arreglo:
             return self.convADiccionarios()
@@ -67,11 +83,19 @@ class Maestro(Arreglo):
 
     def guardar_como_json(self):
         clase = self.__class__.__name__
-        nombre_archivo = f"{clase}.json"
         datos = self.convADiccionario()
+
+        db = DBManager()
+        if db.intentar_conexion():
+            db.crear_coleccion("maestros")
+            if db.guardar_datos("maestros", datos, clase):
+                print(f"Datos guardados en MongoDB")
+                return
+
+        nombre_archivo = f"{clase}.json"
         with open(nombre_archivo, "w", encoding="utf-8") as f:
             json.dump(datos, f, indent=4, ensure_ascii=False)
-        print(f"Archivo guardado como {nombre_archivo}")
+        print(f"Guardado como JSON por conexión fallida a MongoDB")
 
     def __str__(self):
         if self.es_arreglo:
@@ -94,7 +118,7 @@ if __name__ == "__main__":
     maestros.guardar_como_json()
 
     maestrosDesdeJson = Maestro()
-    maestrosDesdeJson.instanciar("Maestro.json")
+    maestrosDesdeJson.cargar_desde_db()
 
     m4 = Maestro("Nuevo", "Maestro", 30, "4", "Python")
     maestrosDesdeJson.agregar(m4)

@@ -14,5 +14,13 @@
         "edad": 19,
         "matricula": 23170119,
         "promedio": 9.3
+    },
+    {
+        "id": 23170,
+        "nombre": "jesus",
+        "apellido": "puto",
+        "edad": 18,
+        "matricula": 23170,
+        "promedio": 8.0
     }
 ]

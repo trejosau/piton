@@ -1,5 +1,7 @@
 import json
 from arreglo import Arreglo
+from db_manager import DBManager
+
 
 class Alumno(Arreglo):
     def __init__(self, nombre=None, apellido=None, edad=None, matricula=None, promedio=None, **kwargs):
@@ -17,10 +19,10 @@ class Alumno(Arreglo):
 
     def leerJson(self, archivo):
         with open(archivo, "r", encoding="utf-8") as f:
-            data=json.load(f)
+            data = json.load(f)
             return self.instanciar(data)
 
-    def es_alumno(self,dic):
+    def es_alumno(self, dic):
         campos_obligatorios = {"nombre", "apellido", "edad", "matricula", "promedio"}
         return campos_obligatorios.issubset(dic.keys())
 
@@ -47,13 +49,34 @@ class Alumno(Arreglo):
                 print("ERROR: El archivo no corresponde a un alumno válido. Usa un JSON de alumnos válido.")
                 return False
 
+    def cargar_desde_db(self):
+        db = DBManager()
+        if db.intentar_conexion():
+            datos = db.cargar_datos("alumnos", "Alumno")
+            if datos:
+                self.instanciar(datos)
+                return True
+        try:
+            self.leerJson("Alumno.json")
+            return True
+        except:
+            return False
+
     def guardar_como_json(self):
         clase = self.__class__.__name__
-        nombre_archivo = f"{clase}.json"
         datos = self.convADiccionario()
+
+        db = DBManager()
+        if db.intentar_conexion():
+            db.crear_coleccion("alumnos")
+            if db.guardar_datos("alumnos", datos, clase):
+                print(f"Datos guardados en MongoDB")
+                return
+
+        nombre_archivo = f"{clase}.json"
         with open(nombre_archivo, "w", encoding="utf-8") as f:
             json.dump(datos, f, indent=4, ensure_ascii=False)
-        print(f"Archivo guardado como {nombre_archivo}")
+        print(f"Guardado como JSON por conexión fallida a MongoDB")
 
     def __str__(self):
         if getattr(self, 'es_arreglo', False):
@@ -95,7 +118,5 @@ if __name__ == "__main__":
     alumnos.mostrar_diccionario()
 
     alumnosDesdeJson = Alumno()
-    alumnosDesdeJson.instanciar("Alumno.json")
+    alumnosDesdeJson.cargar_desde_db()
     alumnosDesdeJson.mostrar_diccionario()
-
-

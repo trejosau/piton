@@ -2,6 +2,8 @@ import json
 from arreglo import Arreglo
 from alumno import Alumno
 from maestro import Maestro
+from db_manager import DBManager
+
 
 class Grupo(Arreglo):
     _id_counter = 1
@@ -51,9 +53,22 @@ class Grupo(Arreglo):
                 self.alumnos = Alumno()
                 self.alumnos.instanciar(datos["alumnos"])
             else:
-                
                 self.alumnos = Alumno()
             self.es_arreglo = False
+
+    def cargar_desde_db(self):
+        db = DBManager()
+        if db.intentar_conexion():
+            datos = db.cargar_datos("grupos", "Grupo")
+            if datos:
+                self.instanciar(datos)
+                return True
+        try:
+            datos = self.leerJson("Grupo.json")
+            self.instanciar(datos)
+            return True
+        except:
+            return False
 
     def convADiccionario(self):
         if self.es_arreglo:
@@ -66,10 +81,20 @@ class Grupo(Arreglo):
         }
 
     def guardar_como_json(self):
-        nombre_archivo = "Grupo.json"
+        clase = self.__class__.__name__
         datos = self.convADiccionario()
+
+        db = DBManager()
+        if db.intentar_conexion():
+            db.crear_coleccion("grupos")
+            if db.guardar_datos("grupos", datos, clase):
+                print(f"Datos guardados en MongoDB")
+                return
+
+        nombre_archivo = f"{clase}.json"
         with open(nombre_archivo, "w", encoding="utf-8") as f:
             json.dump(datos, f, indent=4, ensure_ascii=False)
+        print(f"Guardado como JSON por conexión fallida a MongoDB")
 
     def __str__(self):
         if self.es_arreglo:
@@ -100,5 +125,5 @@ if __name__ == "__main__":
     grupos_mobile.guardar_como_json()
 
     grupos_desdeJson = Grupo()
-    grupos_desdeJson.instanciar("Grupo.json")
+    grupos_desdeJson.cargar_desde_db()
     grupos_desdeJson.guardar_como_json()

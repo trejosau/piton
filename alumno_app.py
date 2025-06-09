@@ -2,14 +2,22 @@ import streamlit as st
 import os
 from alumno import Alumno
 
+
 class AppAlumnos:
     def __init__(self, colecciones):
         self.colecciones = colecciones
-        if os.path.exists("Alumno.json"):
+        self.cargar_alumnos_inicial()
+
+    def cargar_alumnos_inicial(self):
+        if "Alumnos desde archivo" not in self.colecciones:
             alumnos_desde_json = Alumno()
-            alumnos_desde_json.instanciar("Alumno.json")
-            self.colecciones["Alumnos desde archivo"] = alumnos_desde_json
-            st.info("Colección 'Alumnos desde archivo' cargada desde Alumno.json")
+            if alumnos_desde_json.cargar_desde_db():
+                self.colecciones["Alumnos desde archivo"] = alumnos_desde_json
+                st.info("Colección 'Alumnos desde archivo' cargada desde base de datos")
+            elif os.path.exists("Alumno.json"):
+                alumnos_desde_json.leerJson("Alumno.json")
+                self.colecciones["Alumnos desde archivo"] = alumnos_desde_json
+                st.info("Colección 'Alumnos desde archivo' cargada desde archivo JSON")
 
     def formulario_alumno(self):
         nombre = st.text_input("Nombre", key="form_nombre")
@@ -73,10 +81,7 @@ class AppAlumnos:
                                                   key=f"edit_matricula_{al.matricula}")
                 nuevo_promedio = st.number_input("Promedio", 0.0, 10.0, al.promedio, step=0.1,
                                                  key=f"edit_prom_{al.matricula}")
-                materias_default = ", ".join(al.materias)
-                nuevas_materias = st.text_area("Materias (separadas por coma)", value=materias_default,
-                                                    key=f"edit_materias_{al.matricula}")
-                materias = [m.strip() for m in nuevas_materias.split(",") if m.strip()]
+
                 col1, col2 = st.columns(2)
                 if col1.button("Guardar", key=f"save_{al.matricula}"):
                     matriculas_existentes = [a.matricula for i, a in enumerate(alumnos) if i != idx]
@@ -111,9 +116,12 @@ class AppAlumnos:
                     st.rerun()
 
     def opciones_extra_alumno(self, coleccion, coleccion_actual):
-        if st.button("Guardar colección como JSON", key=f"guardar_{coleccion_actual}"):
-            coleccion.guardar_como_json()
-            st.success(f"Colección '{coleccion_actual}' guardada.")
+        if st.button("Guardar colección", key=f"guardar_{coleccion_actual}"):
+            try:
+                coleccion.guardar_como_json()
+                st.success(f"Colección '{coleccion_actual}' guardada correctamente.")
+            except Exception as e:
+                st.error(f"Error al guardar: {e}")
 
         if st.button("Mostrar como diccionario", key=f"dict_{coleccion_actual}_alumno"):
             st.json(coleccion.convADiccionario())
