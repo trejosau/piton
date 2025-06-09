@@ -10,36 +10,18 @@ class AppGrupos:
         self.colecciones = colecciones
         self.maestros_disponibles = maestros_disponibles or []
         self.alumnos_disponibles = alumnos_disponibles or []
+        self.cargar_grupos_inicial()
 
-        if os.path.exists("Grupo.json"):
+    def cargar_grupos_inicial(self):
+        if "Grupos desde archivo" not in self.colecciones:
             grupos_desde_json = Grupo()
-            grupos_desde_json.instanciar("Grupo.json")
-            self.colecciones["Grupos desde archivo"] = grupos_desde_json
-            st.info("Colección 'Grupos desde archivo' cargada desde Grupo.json")
-
-    def cargar_coleccion_json_grupo(self):
-        st.subheader("Cargar colección de grupos desde archivo JSON")
-        with st.form("form_json_grupos"):
-            archivo = st.file_uploader("Selecciona un archivo JSON válido de grupos", type=["json"])
-            nombre_col = st.text_input("Nombre para la nueva colección de grupos")
-            cargar = st.form_submit_button("Cargar colección")
-            if cargar:
-                if archivo and nombre_col and nombre_col not in self.colecciones:
-                    try:
-                        data = json.load(archivo)
-                        grupos_cargados = Grupo()
-                        grupos_cargados.instanciar(data)
-                        items_ok = hasattr(grupos_cargados, "items") and isinstance(grupos_cargados.items, list) and grupos_cargados.items
-                        if not items_ok:
-                            st.error("El archivo no contiene grupos válidos.")
-                        else:
-                            self.colecciones[nombre_col] = grupos_cargados
-                            st.success(f"Colección '{nombre_col}' cargada con {len(grupos_cargados.items)} grupos.")
-                            st.rerun()
-                    except Exception as e:
-                        st.error(f"Error cargando JSON: {e}")
-                else:
-                    st.warning("Falta archivo, nombre o ya existe una colección con ese nombre.")
+            if grupos_desde_json.cargar_desde_db():
+                self.colecciones["Grupos desde archivo"] = grupos_desde_json
+                st.info("Colección 'Grupos desde archivo' cargada desde base de datos")
+            elif os.path.exists("Grupo.json"):
+                grupos_desde_json.leerJson("Grupo.json")
+                self.colecciones["Grupos desde archivo"] = grupos_desde_json
+                st.info("Colección 'Grupos desde archivo' cargada desde archivo JSON")
 
     def crear_coleccion_y_grupo(self):
         st.subheader("Crear nueva colección y grupo")
@@ -161,8 +143,6 @@ class AppGrupos:
 
     def render(self):
         st.header("Colecciones de Grupos")
-        self.cargar_coleccion_json_grupo()
-        st.markdown("---")
         if not self.maestros_disponibles and "colecciones_maestros" in st.session_state:
             maestros = []
             for col in st.session_state["colecciones_maestros"].values():
