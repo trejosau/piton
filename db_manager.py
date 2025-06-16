@@ -24,17 +24,10 @@ class DBManager:
             self.client = MongoClient(uri, server_api=ServerApi('1'))
             self.db = self.client.escuela
 
-            ping_result = self.client.admin.command('ping')
-            print(f"Ping result: {ping_result}")
-            print("¡Conectado exitosamente a MongoDB!")
-
             self.connected = True
             return True
         except Exception as e:
-            print(f"Error de conexión a MongoDB: {e}")
-            print(f"Tipo de error: {type(e).__name__}")
-            import traceback
-            traceback.print_exc()
+            print(f"Error al conectar a MongoDB: {e}")
             self.connected = False
             return False
 
