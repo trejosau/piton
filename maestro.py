@@ -86,16 +86,8 @@ class Maestro(Arreglo):
         datos = self.convADiccionario()
 
         db = DBManager()
-        if db.intentar_conexion():
-            db.crear_coleccion("maestros")
-            if db.guardar_datos("maestros", datos, clase):
-                print(f"Datos guardados en MongoDB")
-                return
 
-        nombre_archivo = f"{clase}.json"
-        with open(nombre_archivo, "w", encoding="utf-8") as f:
-            json.dump(datos, f, indent=4, ensure_ascii=False)
-        print(f"Guardado como JSON por conexión fallida a MongoDB")
+        db.guardar_datos("maestros", datos, clase)
 
     def __str__(self):
         if self.es_arreglo:

@@ -1,18 +1,10 @@
 [
     {
-        "id": 23170093,
-        "nombre": "Albertooooo",
-        "apellido": "Trejo",
+        "id": 231702,
+        "nombre": "juanito",
+        "apellido": "perez",
         "edad": 18,
-        "matricula": 23170093,
-        "promedio": 10.0
-    },
-    {
-        "id": 23170119,
-        "nombre": "Jesus",
-        "apellido": "De la rosa",
-        "edad": 19,
-        "matricula": 23170119,
-        "promedio": 9.3
+        "matricula": 231702,
+        "promedio": 8.0
     }
 ]
