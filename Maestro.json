@@ -1,10 +1,10 @@
 [
     {
         "id": "123",
-        "nombre": "a",
-        "apellido": "a",
+        "nombre": "profe juan",
+        "apellido": "perez",
         "edad": 18,
         "num_maestro": "123",
-        "especialidad": "aasd"
+        "especialidad": "asdasd"
     }
 ]
