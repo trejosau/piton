@@ -1,18 +1,26 @@
 [
     {
         "id": 23170,
-        "nombre": "albertoooooo2",
-        "apellido": "trejoooooo2",
+        "nombre": "affff",
+        "apellido": "afffff",
+        "edad": 18,
+        "matricula": 23170345,
+        "promedio": 8.0
+    },
+    {
+        "id": 23170,
+        "nombre": "a",
+        "apellido": "a",
         "edad": 18,
         "matricula": 23170,
         "promedio": 8.0
     },
     {
-        "id": 231702,
-        "nombre": "nuevo alumno",
-        "apellido": "nuevo apellido",
+        "id": 231705,
+        "nombre": "aff",
+        "apellido": "aff",
         "edad": 18,
-        "matricula": 231702,
+        "matricula": 231705,
         "promedio": 8.0
     }
 ]

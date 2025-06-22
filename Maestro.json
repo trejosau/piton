@@ -1,10 +1,26 @@
 [
     {
-        "id": "123",
-        "nombre": "profe juan",
-        "apellido": "perez",
+        "id": "",
+        "nombre": "a",
+        "apellido": "a",
         "edad": 18,
-        "num_maestro": "123",
-        "especialidad": "asdasd"
+        "num_maestro": "",
+        "especialidad": ""
+    },
+    {
+        "id": "31",
+        "nombre": "af",
+        "apellido": "af",
+        "edad": 18,
+        "num_maestro": "31",
+        "especialidad": "a"
+    },
+    {
+        "id": "314",
+        "nombre": "affgffff",
+        "apellido": "afffff",
+        "edad": 18,
+        "num_maestro": "314",
+        "especialidad": "aa"
     }
 ]

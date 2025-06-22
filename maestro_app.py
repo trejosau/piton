@@ -115,7 +115,7 @@ class AppMaestros:
                     st.rerun()
 
     def opciones_extra_maestro(self, coleccion, coleccion_actual):
-        if st.button("Guardar colección como JSON", key=f"guardar_{coleccion_actual}_maestro"):
+        if st.button("Guardar colección", key=f"guardar_{coleccion_actual}_maestro"):
             coleccion.guardar_como_json()
             st.success(f"Colección '{coleccion_actual}' guardada.")
 

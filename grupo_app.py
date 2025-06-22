@@ -171,7 +171,7 @@ class AppGrupos:
             else:
                 st.info("No hay grupos en esta colección.")
 
-            if st.button("Guardar colección como JSON", key=f"guardar_{coleccion_actual}_grupo"):
+            if st.button("Guardar colección", key=f"guardar_{coleccion_actual}_grupo"):
                 coleccion.guardar_como_json()
                 st.success(f"Colección '{coleccion_actual}' guardada como JSON.")
 
